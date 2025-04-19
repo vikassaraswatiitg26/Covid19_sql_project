@@ -40,29 +40,45 @@
 1. Total Cases vs Total Deaths
 -- Determining death likelihood per infection by country:
 ```
- SELECT location1, date, total_cases, total_deaths,
+ SELECT
+       location1,
+       date,
+       total_cases,
+       total_deaths,
        ROUND((total_deaths/total_cases)*100, 2) AS Death_Percentage
-FROM Covid_Death
-WHERE location1 LIKE '%India%' AND total_cases IS NOT NULL;
+FROM
+     Covid_Death
+WHERE location1 LIKE '%India%'
+      AND total_cases IS NOT NULL;
 ```
 2. Infection Rate per Population
 
 -- Shows what percentage of a country's population has been infected:
 ```
-SELECT location1, date, total_cases, population,
+SELECT
+       location1,
+       date,
+       total_cases,
+       population,
        ROUND((total_cases/population)*100, 2) AS Infection_Rate
 FROM Covid_Death
-WHERE continent IS NOT NULL AND total_cases IS NOT NULL;
+WHERE continent IS NOT NULL
+      AND total_cases IS NOT NULL;
 ```
 3. Vaccination Progress
 
 -- Using window functions to calculate rolling vaccination numbers and vaccination percentages:
 ```
-SELECT cd.continent, cd.location1, cd.date, cd.population, cv.new_vaccinations,
-       SUM(cv.new_vaccinations) OVER (PARTITION BY cd.location1 ORDER BY cd.date) AS rolling_people_vaccinated,
-       ROUND((SUM(cv.new_vaccinations) OVER (PARTITION BY cd.location1 ORDER BY cd.date) / cd.population)*100, 3) AS Vaccinated_Percentage
+SELECT
+      cd.continent,
+      cd.location1,
+      cd.date,
+      cd.population,
+      cv.new_vaccinations,
+      SUM(cv.new_vaccinations) OVER (PARTITION BY cd.location1 ORDER BY cd.date) AS rolling_people_vaccinated,
+      ROUND((SUM(cv.new_vaccinations) OVER (PARTITION BY cd.location1 ORDER BY cd.date) / cd.population)*100, 3) AS Vaccinated_Percentage
 FROM Covid_death cd
-JOIN Covid_vaccination cv ON cd.location1 = cv.location1 AND cd.date = cv.date
+      JOIN Covid_vaccination cv ON cd.location1 = cv.location1 AND cd.date = cv.date
 WHERE cd.continent IS NOT NULL;
 ```
 
@@ -71,11 +87,15 @@ WHERE cd.continent IS NOT NULL;
 --  Creating a view to assist in later data visualizations:
 ```
 CREATE VIEW pop_vs_vacc AS
-SELECT cd.continent, cd.location1, cd.date, cd.population,
+SELECT
+       cd.continent,
+       cd.location1,
+       cd.date,
+       cd.population,
        cv.new_vaccinations,
        SUM(cv.new_vaccinations) OVER (PARTITION BY cd.location1 ORDER BY cd.date) AS rolling_people_vaccinated
 FROM Covid_death cd
-JOIN Covid_vaccination cv ON cd.location1 = cv.location1 AND cd.date = cv.date
+       JOIN Covid_vaccination cv ON cd.location1 = cv.location1 AND cd.date = cv.date
 WHERE cd.continent IS NOT NULL;
 ```
 
