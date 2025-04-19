@@ -1,1 +1,1 @@
-# Covid19_sql_project
+#Data Exploration of COVID-19 Deaths and Vaccinations Using SQL
